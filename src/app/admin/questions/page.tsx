@@ -1,5 +1,6 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import Link from 'next/link';
 
 interface EmojiOption {
   value: number;
@@ -35,7 +36,7 @@ export default function AdminQuestionsPage() {
   });
 
   // 質問データを取得
-  const fetchQuestions = async () => {
+  const fetchQuestions = useCallback(async () => {
     try {
       const response = await fetch('/api/questions');
       if (response.ok) {
@@ -50,7 +51,7 @@ export default function AdminQuestionsPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   // メッセージ表示
   const showMessage = (type: 'success' | 'error', text: string) => {
@@ -61,7 +62,7 @@ export default function AdminQuestionsPage() {
   // 初期ロード
   useEffect(() => {
     fetchQuestions();
-  }, []);
+  }, [fetchQuestions]);
 
   // 質問を追加
   const handleAddQuestion = async () => {
@@ -519,7 +520,7 @@ export default function AdminQuestionsPage() {
                     <div className="mt-4">
                       <h3 className="text-sm font-medium text-gray-700 mb-2">プレースホルダー:</h3>
                       <div className="p-3 bg-gray-50 rounded-lg border-l-4 border-purple-500">
-                        <p className="text-gray-600 italic">"{question.placeholder}"</p>
+                        <p className="text-gray-600 italic">&quot;{question.placeholder}&quot;</p>
                       </div>
                     </div>
                   )}
@@ -544,18 +545,18 @@ export default function AdminQuestionsPage() {
 
         {/* ナビゲーション */}
         <div className="mt-8 flex gap-4">
-          <a 
+          <Link 
             href="/admin/results" 
             className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200"
           >
             結果画面へ
-          </a>
-          <a 
+          </Link>
+          <Link 
             href="/" 
             className="px-6 py-3 bg-gray-600 text-white rounded-lg font-medium hover:bg-gray-700 transition-colors duration-200"
           >
             サーベイ画面へ
-          </a>
+          </Link>
         </div>
       </div>
     </div>

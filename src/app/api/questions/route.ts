@@ -26,7 +26,7 @@ const loadQuestions = async (): Promise<Question[]> => {
     const filePath = getQuestionsFilePath();
     const fileContent = await fs.readFile(filePath, 'utf-8');
     return JSON.parse(fileContent);
-  } catch (error) {
+  } catch {
     // ファイルが存在しない場合は空配列を返す
     return [];
   }
@@ -59,8 +59,8 @@ export async function GET() {
   try {
     const questions = await loadQuestions();
     return NextResponse.json(questions);
-  } catch (error) {
-    console.error('Error loading questions:', error);
+  } catch (_error) {
+    console.error('Error loading questions:', _error);
     return NextResponse.json(
       { error: 'Failed to load questions' },
       { status: 500 }
@@ -106,8 +106,8 @@ export async function POST(request: NextRequest) {
     await saveQuestions(questions);
 
     return NextResponse.json(newQuestion, { status: 201 });
-  } catch (error) {
-    console.error('Error creating question:', error);
+  } catch (_error) {
+    console.error('Error creating question:', _error);
     return NextResponse.json(
       { error: 'Failed to create question' },
       { status: 500 }
@@ -162,8 +162,8 @@ export async function PUT(request: NextRequest) {
     await saveQuestions(questions);
 
     return NextResponse.json(questions[questionIndex]);
-  } catch (error) {
-    console.error('Error updating question:', error);
+  } catch (_error) {
+    console.error('Error updating question:', _error);
     return NextResponse.json(
       { error: 'Failed to update question' },
       { status: 500 }
@@ -209,8 +209,8 @@ export async function DELETE(request: NextRequest) {
     return NextResponse.json(
       { message: 'Question deleted successfully', deletedQuestion }
     );
-  } catch (error) {
-    console.error('Error deleting question:', error);
+  } catch (_error) {
+    console.error('Error deleting question:', _error);
     return NextResponse.json(
       { error: 'Failed to delete question' },
       { status: 500 }

@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
     try {
       const fileContent = await fs.readFile(filePath, 'utf-8');
       existingData = JSON.parse(fileContent);
-    } catch (error) {
+    } catch {
       // ファイルが存在しない場合は空配列のまま
       console.log('Creating new survey submissions file');
     }
