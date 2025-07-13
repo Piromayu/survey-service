@@ -1,0 +1,16 @@
+[
+  {
+    "submissionId": "1f2f43a1-7e01-40e1-8265-fc7c78e16821",
+    "answers": [
+      {
+        "questionId": 1,
+        "answer": 4
+      },
+      {
+        "questionId": 2,
+        "answer": "テストテスト"
+      }
+    ],
+    "timestamp": "2025-07-13T08:27:47.052Z"
+  }
+]
