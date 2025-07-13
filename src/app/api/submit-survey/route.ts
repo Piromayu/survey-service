@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { promises as fs } from 'fs';
-import path from 'path';
+import { supabase } from '@/lib/supabase';
 
 interface SurveyAnswer {
   questionId: number;
@@ -16,9 +15,8 @@ interface SurveySubmission {
 
 export async function POST(request: NextRequest) {
   try {
-    // リクエストボディを取得
     const body: SurveySubmission = await request.json();
-    
+
     // バリデーション
     if (!body.submissionId || !body.groupId || !body.answers || !body.timestamp) {
       return NextResponse.json(
@@ -41,41 +39,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // JSONファイルのパスを設定
-    const dataDirectory = path.join(process.cwd(), 'data');
-    const filePath = path.join(dataDirectory, 'survey_submissions.json');
+    // Supabaseにデータを保存
+    const { error } = await supabase
+      .from('survey_submissions')
+      .insert([
+        {
+          group_id: body.groupId,
+          answers: body.answers,
+          created_at: body.timestamp
+        }
+      ]);
 
-    // データディレクトリが存在しない場合は作成
-    try {
-      await fs.access(dataDirectory);
-    } catch {
-      await fs.mkdir(dataDirectory, { recursive: true });
+    if (error) {
+      console.error('Supabase error:', error);
+      return NextResponse.json(
+        { error: 'Failed to save survey data to database' },
+        { status: 500 }
+      );
     }
-
-    // 既存のデータを読み込み（ファイルが存在しない場合は空配列）
-    let existingData: SurveySubmission[] = [];
-    try {
-      const fileContent = await fs.readFile(filePath, 'utf-8');
-      existingData = JSON.parse(fileContent);
-    } catch {
-      // ファイルが存在しない場合は空配列のまま
-      console.log('Creating new survey submissions file');
-    }
-
-    // 新しい回答データを追加
-    existingData.push(body);
-
-    // ファイルに保存
-    await fs.writeFile(filePath, JSON.stringify(existingData, null, 2), 'utf-8');
 
     return NextResponse.json(
-      { message: 'Survey submitted successfully.' },
+      { message: 'Survey submitted successfully to Supabase.' },
       { status: 200 }
     );
 
   } catch (error) {
     console.error('Error submitting survey:', error);
-    
+
     if (error instanceof SyntaxError) {
       return NextResponse.json(
         { error: 'Invalid JSON format in request body' },
@@ -88,4 +78,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}
